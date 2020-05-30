@@ -1,0 +1,8 @@
+Cells:Cell Line Viable
+DNA:DNA Genomic
+DNA:DNA Somatic
+RNA:Total RNA
+Tissue:Fresh Frozen Tissue
+Tissue:PAXgene Preserved
+Tissue:PAXgene Preserved Paraffin-embedded
+materialType
