@@ -113,3 +113,5 @@ if __name__ == '__main__':
     subject_ids = build_subject_table(sraruntsv)
     build_subject_in_collection_table(subject_ids)
     add_histology_biobank_samples_table(histologycsv, biobanktsv)
+
+    # when adding samples from SRA run table, watch for duplicates
