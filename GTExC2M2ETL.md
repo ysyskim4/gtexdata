@@ -8,18 +8,18 @@ pdf_options:
 ## Tables
 
 - [ ] `file`
-- [ ] `biosample`
-- [ ] `subject`
-- [ ] `project`
-- [ ] `project_in_project`
-- [ ] `collection`
-- [ ] `collection_in_collection`
+- [X] `biosample`
+- [X] `subject`
+- [X] `project`
+- [X] `project_in_project`
+- [X] `collection`
+- [X] `collection_in_collection`
 - [ ] `file_in_collection`
-- [ ] `biosample_in_collection`
-- [ ] `subject_in_collection`
+- [X] `biosample_in_collection`
+- [X] `subject_in_collection`
 - [ ] `file_describes_biosample`
 - [ ] `file_describes_subject`
-- [ ] `biosample_from_subject`
+- [X] `biosample_from_subject`
 - [ ] `subject_role_taxonomy`
 - [ ] `assay_type`
 - [ ] `ncbi_taxonomy`
@@ -28,7 +28,7 @@ pdf_options:
 - [ ] `data_type`
 - [ ] `subject_role`
 - [ ] `subject_granularity`
-- [ ] `id_namespace`
+- [X] `id_namespace`
 
 
 # GTEx V8 C2M2 Level 1 ETL Process

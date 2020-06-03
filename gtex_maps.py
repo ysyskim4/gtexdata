@@ -23,6 +23,7 @@ anatomy_dict = {
     'Cells - Cultured fibroblasts': 'UBERON:0000XXX',
     'Cells - EBV-transformed lymphocytes': None, #'EFO:0002009',
     'Cells - Leukemia cell line (CML)': None, #'EFO:0000572',
+    'Cells - Transformed fibroblasts': None, #??
     'Cervix - Ectocervix': 'UBERON:0012249',
     'Cervix - Endocervix': 'UBERON:0000458',
     'Colon - Sigmoid': 'UBERON:0001159',
@@ -54,4 +55,24 @@ anatomy_dict = {
     'Uterus': 'UBERON:0000995',
     'Vagina': 'UBERON:0000996',
     'Whole Blood': 'UBERON:0013756'
+    }
+
+assay_types = {
+    'WGS': 'OBI:0002117',
+    'RNA-Seq': 'OBI:0001271',
+    'WXS': 'OBI:0002118'
+    }
+
+edam = {'file_formats': {
+    'crai,cram': 'format:3462',
+    'cram,crai': 'format:3462',
+    'bam,sra': 'format:2572',
+    'sra,bam': 'format:2572',
+    'bam,contigs,sra': 'format:2572',
+    'sra': 'format:3698'},
+    'data_types': {
+        'RNA-Seq': 'data:3495',
+        'WGS': 'data:3494',
+        'WXS': 'data:3494'
+    }
 }
