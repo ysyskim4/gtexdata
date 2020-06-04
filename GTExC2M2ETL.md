@@ -185,3 +185,49 @@ lincs_datapackage = datapackage.Package(lincs_datapackage_json, strict=True)
 ...     print(resource['name'])
 ...     tableschema.validate(resource['schema'])
 ```
+
+```
+
+
+import datapackage
+package = datapackage.DataPackage('gtex-v8-datapackage.json')
+anatomy = package.get_resource('anatomy')
+anatomy.descriptor
+from tableschema import Table
+table = Table('anatomy.tsv', schema=anatomy.descriptor)
+
+import datapackage
+package = datapackage.DataPackage('datapackage/gtex-v8-datapackage.json')
+anatomy = package.get_resource('anatomy')
+from tableschema import Table
+table = Table('anatomy.tsv', schema=anatomy.descriptor)
+from sqlalchemy import create_engine
+engine = create_engine('sqlite://')
+table = Table('datapackage/anatomy.tsv', schema=anatomy.descriptor)
+anatomy.table.save('data', storage='sql', engine=engine)
+
+# Load order
+datapackage/id_namespace.tsv
+datapackage/subject_role.tsv
+datapackage/subject_granularity.tsv
+datapackage/anatomy.tsv
+datapackage/assay_type.tsv
+datapackage/file_format.tsv
+datapackage/data_type.tsv
+datapackage/ncbi_taxonomy.tsv
+datapackage/project.tsv
+datapackage/project_in_project.tsv
+datapackage/collection.tsv
+datapackage/collection_defined_by_project.tsv
+datapackage/collection_in_collection.tsv
+datapackage/subject.tsv
+datapackage/biosample.tsv
+datapackage/file.tsv
+datapackage/biosample_from_subject.tsv
+datapackage/biosample_in_collection.tsv
+datapackage/file_describes_biosample.tsv
+datapackage/file_describes_subject.tsv
+datapackage/file_in_collection.tsv
+datapackage/subject_in_collection.tsv
+datapackage/subject_role_taxonomy.tsv
+```
