@@ -20,7 +20,7 @@ anatomy_dict = {
     'Brain - Spinal cord (cervical c-1)': 'UBERON:0006469',
     'Brain - Substantia nigra': 'UBERON:0002038',
     'Breast - Mammary Tissue': 'UBERON:0008367',
-    'Cells - Cultured fibroblasts': 'UBERON:0000XXX',
+    'Cells - Cultured fibroblasts': None, # 'UBERON:0000XXX',
     'Cells - EBV-transformed lymphocytes': None, #'EFO:0002009',
     'Cells - Leukemia cell line (CML)': None, #'EFO:0000572',
     'Cells - Transformed fibroblasts': None, #??
@@ -63,7 +63,7 @@ assay_types = {
     'WXS': 'OBI:0002118'
     }
 
-edam = {'file_formats': {
+edam_types = {'file_formats': {
     'crai,cram': 'format:3462',
     'cram,crai': 'format:3462',
     'bam,sra': 'format:2572',

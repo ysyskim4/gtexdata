@@ -4,8 +4,8 @@
 
 import sys
 import csv
-
-from gtex_maps import anatomy_dict, assay_types, edam
+from pronto import Ontology
+from gtex_maps import anatomy_dict, assay_types, edam_types
 
 namespace = 'https://gtexportal.org'
 project_namespace = 'https://gtexportal.org'
@@ -29,7 +29,7 @@ def build_subject_table(srarun):
             subjects.add(row['submitted_subject_id'])
 
     with open('datapackage/subject.tsv', 'w') as tsvfile,\
-      open('subject_role_taxonomy.tsv', 'w') as role_taxononmy_file:
+      open('datapackage/subject_role_taxonomy.tsv', 'w') as role_taxononmy_file:
         writer = csv.DictWriter(tsvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         role_taxonomy_writer = csv.DictWriter(role_taxononmy_file,
@@ -214,8 +214,8 @@ def build_files(srarun):
                            'sha256': None,
                            'md5': None,
                            'filename': None,
-                           'file_format': edam['file_formats'][row['DATASTORE filetype']],
-                           'data_type': edam['data_types'][row['Assay Type']]
+                           'file_format': edam_types['file_formats'][row['DATASTORE filetype']],
+                           'data_type': edam_types['data_types'][row['Assay Type']]
                            }
 
             filewriter.writerow(filerow)
@@ -232,6 +232,100 @@ def build_files(srarun):
                                                           'biosample_id_namespace': namespace,
                                                           'biosample_id': row['biospecimen_repository_sample_id']})
 
+def build_vocabularies():
+    edam_onto = Ontology('inputdata/edam.obo')
+    # Hacked up Uberon so it will load
+    uberon_onto = Ontology('inputdata/human-view.obo')
+    obi_onto = Ontology('inputdata/obi.obo')
+    
+    fieldnames = ['id', 'name', 'description', 'synonyms']
+    
+    with open('datapackage/data_type.tsv', 'w') as data_type_file:
+        data_type_writer = csv.DictWriter(data_type_file,
+                                              fieldnames=fieldnames, delimiter='\t')
+        data_type_writer.writeheader()
+        for v in set(i for i in edam_types['data_types'].values() if i is not None):
+            dt_id = 'http://edamontology.org/' + v.replace(':', '_')
+            dt_term = edam_onto.get(dt_id)
+            dt_name = dt_term.name
+            dt_def = dt_term.definition
+            syns = ''
+            for s in dt_term.synonyms:
+                syns += s.description + '; ' 
+            if not s:
+                syns = None
+            else:
+                syns = syns[:-2]
+            data_type = {'id': v,
+                             'name': dt_name,
+                             'description': dt_def,
+                             'synonyms': syns}
+            data_type_writer.writerow(data_type) 
+
+    with open('datapackage/file_format.tsv', 'w') as file_format_file:
+        file_format_writer = csv.DictWriter(file_format_file,
+                                              fieldnames=fieldnames, delimiter='\t')
+        file_format_writer.writeheader()
+        for v in set(i for i in edam_types['file_formats'].values() if i is not None):
+            ff_id = 'http://edamontology.org/' + v.replace(':', '_')
+            ff_term = edam_onto.get(ff_id)
+            ff_name = ff_term.name
+            ff_def = ff_term.definition
+            syns = ''
+            for s in ff_term.synonyms:
+                syns += s.description + '; ' 
+            if not s:
+                syns = None
+            else:
+                syns = syns[:-2]
+            file_format = {'id': v,
+                               'name': ff_name,
+                               'description': ff_def,
+                               'synonyms': syns}
+            file_format_writer.writerow(file_format)
+
+    with open('datapackage/assay_type.tsv', 'w') as assay_type_file:
+        assay_type_writer = csv.DictWriter(assay_type_file,
+                                              fieldnames=fieldnames, delimiter='\t')
+        assay_type_writer.writeheader()
+        for at_id in set(i for i in assay_types.values() if i is not None):
+            at_term = obi_onto.get(at_id)
+            at_name = at_term.name
+            at_def = at_term.definition
+            syns = ''
+            for s in at_term.synonyms:
+                syns += s.description + '; ' 
+            if not s:
+                syns = None
+            else:
+                syns = syns[:-2]
+            assay_type = {'id': at_id,
+                             'name': at_name,
+                             'description': at_def,
+                             'synonyms': syns}
+            assay_type_writer.writerow(assay_type) 
+
+    with open('datapackage/anatomy.tsv', 'w') as anatomy_file:
+        anatomy_writer = csv.DictWriter(anatomy_file,
+                                              fieldnames=fieldnames, delimiter='\t')
+        anatomy_writer.writeheader()
+        for an_id in set(i for i in anatomy_dict.values() if i is not None):
+            an_term = uberon_onto.get(an_id)
+            an_name = an_term.name
+            an_def = an_term.definition
+            syns = ''
+            for s in an_term.synonyms:
+                syns += s.description + '; ' 
+            if not s:
+                syns = None
+            else:
+                syns = syns[:-2]
+            anatomy = {'id': an_id,
+                             'name': an_name,
+                             'description': an_def,
+                             'synonyms': syns}
+            anatomy_writer.writerow(anatomy)
+        
 if __name__ == '__main__':
 
     sraruntsv = 'inputdata/SraRunTable.tsv' # tab delimited
@@ -241,3 +335,5 @@ if __name__ == '__main__':
     build_subject_in_collection_table(subject_ids)
     build_samples(histologycsv, biobanktsv, sraruntsv)
     build_files(sraruntsv)
+    build_vocabularies()
+    

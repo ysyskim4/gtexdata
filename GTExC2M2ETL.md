@@ -7,27 +7,27 @@ pdf_options:
 
 ## Tables
 
-- [ ] `file`
+- [X] `file`
 - [X] `biosample`
 - [X] `subject`
 - [X] `project`
 - [X] `project_in_project`
 - [X] `collection`
 - [X] `collection_in_collection`
-- [ ] `file_in_collection`
+- [X] `file_in_collection`
 - [X] `biosample_in_collection`
 - [X] `subject_in_collection`
-- [ ] `file_describes_biosample`
-- [ ] `file_describes_subject`
+- [X] `file_describes_biosample`
+- [X] `file_describes_subject`
 - [X] `biosample_from_subject`
-- [ ] `subject_role_taxonomy`
+- [X] `subject_role_taxonomy`
 - [ ] `assay_type`
-- [ ] `ncbi_taxonomy`
+- [X] `ncbi_taxonomy`
 - [ ] `anatomy`
 - [ ] `file_format`
 - [ ] `data_type`
-- [ ] `subject_role`
-- [ ] `subject_granularity`
+- [X] `subject_role`
+- [X] `subject_granularity`
 - [X] `id_namespace`
 
 
@@ -166,3 +166,22 @@ and the closest I see are ‘sequencing assay’ http://www.ontobee.org/ontology
 12:11
 unless we’re allowed to use sub-types of those?
 
+
+## Validate
+
+```
+import datapackage
+datapackage.Package("datapackage.json", strict=True)
+datapackage.Package(datapackage_json_contents, strict=True)
+
+import tableschema
+tableschema.validate(datapackage_json_contents)
+
+
+lincs_datapackage_json = json.loads(dpackage_json)
+lincs_datapackage = datapackage.Package(lincs_datapackage_json, strict=True)
+>>> for resource in lincs_datapackage['resources']:
+...     print(resource['profile'])
+...     print(resource['name'])
+...     tableschema.validate(resource['schema'])
+```
