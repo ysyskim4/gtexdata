@@ -1,4 +1,4 @@
 id	name	description	synonyms
 format:3462	CRAM		
 format:2572	BAM		
-format:3698	SRA format		SRA archive format; SRA
+format:3698	SRA format		

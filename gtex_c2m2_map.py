@@ -4,13 +4,19 @@
 
 import sys
 import csv
+import datapackage
+
 from pronto import Ontology
 from gtex_maps import anatomy_dict, assay_types, edam_types
+
+from tableschema.exceptions import CastError
 
 namespace = 'https://gtexportal.org'
 project_namespace = 'https://gtexportal.org'
 project_id = 0
 collection_id = 'V8'
+biobank_collection_id = 'biobank'
+histology_collection_id = 'biobank'
 
 def build_subject_table(srarun):
     fieldnames = ['id_namespace', 'id', 'project_id_namespace',
@@ -117,6 +123,10 @@ def build_samples(histology, biobank, srarun):
                                                 'biosample_id': sample['id'],
                                                 'collection_id_namespace': namespace,
                                                 'collection_id': collection_id})
+            sample_in_coll_writer.writerow({'biosample_id_namespace': namespace,
+                                                'biosample_id': sample['id'],
+                                                'collection_id_namespace': namespace,
+                                                'collection_id': histology_collection_id})
             sample_from_subject_writer.writerow({'biosample_id_namespace': namespace,
                                                      'biosample_id': sample['id'],
                                                      'subject_id_namespace': namespace,
@@ -138,20 +148,40 @@ def build_samples(histology, biobank, srarun):
                                                 'biosample_id': sample['id'],
                                                 'collection_id_namespace': namespace,
                                                 'collection_id': collection_id})
+            sample_in_coll_writer.writerow({'biosample_id_namespace': namespace,
+                                                'biosample_id': sample['id'],
+                                                'collection_id_namespace': namespace,
+                                                'collection_id': biobank_collection_id})
             sample_from_subject_writer.writerow({'biosample_id_namespace': namespace,
                                                      'biosample_id': sample['id'],
                                                      'subject_id_namespace': namespace,
                                                      'subject_id':  row['subjectId']})
 
+        srasamples = {}
         for row in srarunreader:
+            sample_id = row['biospecimen_repository_sample_id']
+            release_date = row['ReleaseDate']
+            if sample_id in srasamples:
+                if release_date < srasamples[sample_id]['date']:
+                    srasamples[sample_id]['date'] = release_date
+            else:
+                srasamples[sample_id] = {'date': release_date,
+                                             'anatomy': anatomy_dict[row['body_site']],
+                                             'assay_type': assay_types[row['Assay Type']]
+                                             }
+                          
+        for sample_id in srasamples:
+            release_date = srasamples[sample_id]['date']
+            assay_type = srasamples[sample_id]['assay_type']
+            anatomy = srasamples[sample_id]['anatomy']
             sample = {'id_namespace': namespace,
-                          'id': row['biospecimen_repository_sample_id'],
+                          'id': sample_id,
                           'project_id_namespace': namespace,
                           'project': project_id,
                           'persistent_id': None,
-                          'creation_time': row['ReleaseDate'],
-                          'assay_type': assay_types[row['Assay Type']],
-                          'anatomy': anatomy_dict[row['body_site']]
+                          'creation_time': release_date,
+                          'assay_type': assay_type,
+                          'anatomy': anatomy
                           }
 
             samplewriter.writerow(sample)
@@ -203,14 +233,19 @@ def build_files(srarun):
         file_describes_biosample_writer.writeheader()
 
         for row in srarunreader:
-            # not clear how to map to 
+            biospecimen = row['biospecimen_repository_sample_id']
+            experiment = row['Experiment']
+            file_id = '{sample}/{experiment}'.format(sample = biospecimen,
+                                                         experiment = experiment)
+
+            nbytes = '{:.0f}'.format(float(row['Bytes']))
             filerow = {'id_namespace': namespace,
-                           'id': row['biospecimen_repository_sample_id'],
+                           'id': file_id,
                            'project_id_namespace': namespace,
                            'project': project_id,
                            'persistent_id': None,
                            'creation_time': row['ReleaseDate'],
-                           'size_in_bytes': row['Bytes'],
+                           'size_in_bytes': nbytes,
                            'sha256': None,
                            'md5': None,
                            'filename': None,
@@ -220,17 +255,17 @@ def build_files(srarun):
 
             filewriter.writerow(filerow)
             file_in_coll_writer.writerow({'file_id_namespace': namespace,
-                                              'file_id': filerow['id'],
+                                              'file_id': file_id,
                                               'collection_id_namespace': namespace,
                                               'collection_id': collection_id})
             file_describes_subject_writer.writerow({'file_id_namespace': namespace,
-                                                        'file_id': filerow['id'],
+                                                        'file_id': file_id,
                                                         'subject_id_namespace': namespace,
                                                         'subject_id': row['submitted_subject_id']})
             file_describes_biosample_writer.writerow({'file_id_namespace': namespace,
-                                                          'file_id': filerow['id'],
+                                                          'file_id': file_id,
                                                           'biosample_id_namespace': namespace,
-                                                          'biosample_id': row['biospecimen_repository_sample_id']})
+                                                          'biosample_id': biospecimen})
 
 def build_vocabularies():
     edam_onto = Ontology('inputdata/edam.obo')
@@ -251,15 +286,18 @@ def build_vocabularies():
             dt_def = dt_term.definition
             syns = ''
             for s in dt_term.synonyms:
-                syns += s.description + '; ' 
-            if not s:
+                syns += s.description + ''
+            if not syns:
                 syns = None
             else:
-                syns = syns[:-2]
+                syns = syns[:-1]
+
             data_type = {'id': v,
                              'name': dt_name,
                              'description': dt_def,
-                             'synonyms': syns}
+            # Synonyms in EDAM don't provide references
+            #                 'synonyms': syns}
+                             'synonyms': None}
             data_type_writer.writerow(data_type) 
 
     with open('datapackage/file_format.tsv', 'w') as file_format_file:
@@ -273,15 +311,17 @@ def build_vocabularies():
             ff_def = ff_term.definition
             syns = ''
             for s in ff_term.synonyms:
-                syns += s.description + '; ' 
-            if not s:
+                syns += s.description + '|' 
+            if not syns:
                 syns = None
             else:
-                syns = syns[:-2]
+                syns = syns[:-1]
             file_format = {'id': v,
                                'name': ff_name,
                                'description': ff_def,
-                               'synonyms': syns}
+            # Synonyms in EDAM don't provide references
+            #                 'synonyms': syns}
+                             'synonyms': None}
             file_format_writer.writerow(file_format)
 
     with open('datapackage/assay_type.tsv', 'w') as assay_type_file:
@@ -294,15 +334,17 @@ def build_vocabularies():
             at_def = at_term.definition
             syns = ''
             for s in at_term.synonyms:
-                syns += s.description + '; ' 
-            if not s:
+                syns += s.description + '|' 
+            if not syns:
                 syns = None
             else:
-                syns = syns[:-2]
+                syns = syns[:-1]
             assay_type = {'id': at_id,
                              'name': at_name,
                              'description': at_def,
-                             'synonyms': syns}
+            # Synonyms semi-broken
+            #                 'synonyms': syns}
+                             'synonyms': None}
             assay_type_writer.writerow(assay_type) 
 
     with open('datapackage/anatomy.tsv', 'w') as anatomy_file:
@@ -315,25 +357,65 @@ def build_vocabularies():
             an_def = an_term.definition
             syns = ''
             for s in an_term.synonyms:
-                syns += s.description + '; ' 
-            if not s:
+                syns += s.description + '|' 
+            if not syns:
                 syns = None
             else:
-                syns = syns[:-2]
+                syns = syns[:-1]
             anatomy = {'id': an_id,
                              'name': an_name,
                              'description': an_def,
-                             'synonyms': syns}
+            # Synonyms semi-broken
+            #                 'synonyms': syns}
+                             'synonyms': None}
             anatomy_writer.writerow(anatomy)
-        
+
+def validate(resource=None):
+    
+    datapackage.validate('datapackage/gtex-v8-datapackage.json')
+    gtex_package = datapackage.DataPackage('datapackage/gtex-v8-datapackage.json', strict=True)
+    if resource != 'all':
+        r = gtex_package.get_resource(resource)
+        print(r.name)
+        try:
+            t = r.read()
+        except CastError as ce:
+            print('Hit cast error')
+            for err in ce.errors:
+                print(err)
+            print(ce)
+        except Exception as inst:
+            print('Hit generic exception')
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+    else:
+        for r in gtex_package.resources:
+            print(r.name)
+            try:
+                t = r.read()
+            except CastError as ce:
+                print('Hit cast error')
+                print(ce.errors)
+                print(ce)
+            except Exception as inst:
+                print('Hit generic exception')
+                print(type(inst))
+                print(inst.args)
+                print(inst)
+            
 if __name__ == '__main__':
 
-    sraruntsv = 'inputdata/SraRunTable.tsv' # tab delimited
-    histologycsv = 'inputdata/GTExHistology.csv' # comma delimited
-    biobanktsv = 'inputdata/biobank_collection_20200527_070347.tsv' # tab delimited
-    subject_ids = build_subject_table(sraruntsv)
-    build_subject_in_collection_table(subject_ids)
-    build_samples(histologycsv, biobanktsv, sraruntsv)
-    build_files(sraruntsv)
-    build_vocabularies()
-    
+    if len(sys.argv) == 1:
+        sraruntsv = 'inputdata/SraRunTable.tsv' # tab delimited
+        histologycsv = 'inputdata/GTExHistology.csv' # comma delimited
+        biobanktsv = 'inputdata/biobank_collection_20200527_070347.tsv' # tab delimited
+        subject_ids = build_subject_table(sraruntsv)
+        build_subject_in_collection_table(subject_ids)
+        build_samples(histologycsv, biobanktsv, sraruntsv)
+        build_files(sraruntsv)
+        build_vocabularies()
+        validate('all')
+    else:
+        validate(sys.argv[1])
+

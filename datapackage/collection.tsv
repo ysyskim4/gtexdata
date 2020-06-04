@@ -1,5 +1,4 @@
-id_namespace	id	persistent_id	abbreviation	name	description
-https://gtexportal.org	V8	https://identifiers.org/dbgap:phs000424.v8.p2	GTEx V8	GTEx Analysis Release V8	The GTEx v8 data set consists of 948 donors and 17,382 samples from 52 tissues and two cell lines, with 838 donors and 15,253 samples having both RNA sequence (RNA-seq) and genotype data from whole genome sequencing (WGS).
-https://gtexportal.org	biobank		GTEx Biobank	GTEx Biobank Samples	The GTEx samples in the freezers, not the ones used for analysis.
-https://gtexportal.org	histology		GTEx Histology	GTEx Histology Samples	GTEx samples used for histology imaging.
-
+id_namespace	id	persistent_id	creation_time	abbreviation	name	description
+https://gtexportal.org	V8	https://identifiers.org/dbgap:phs000424.v8.p2	2019-08-26T00:00:00Z	GTExV8	GTEx Analysis Release V8	The GTEx v8 data set consists of 948 donors and 17,382 samples from 52 tissues and two cell lines, with 838 donors and 15,253 samples having both RNA sequence (RNA-seq) and genotype data from whole genome sequencing (WGS).
+https://gtexportal.org	biobank		2020-05-27T07:03:47Z	GTExBiobank	GTEx Biobank Samples	The GTEx samples in the freezers, not the ones used for analysis.
+https://gtexportal.org	histology		2020-05-27T07:03:47Z	GTExHistology	GTEx Histology Samples	GTEx samples used for histology imaging.
