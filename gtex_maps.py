@@ -60,7 +60,8 @@ anatomy_dict = {
 assay_types = {
     'WGS': 'OBI:0002117',
     'RNA-Seq': 'OBI:0001271',
-    'WXS': 'OBI:0002118'
+    'WXS': 'OBI:0002118',
+    'histology': 'OBI:0600020'
     }
 
 edam_types = {'file_formats': {
