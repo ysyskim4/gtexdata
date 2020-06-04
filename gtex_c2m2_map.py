@@ -18,7 +18,7 @@ collection_id = 'V8'
 biobank_collection_id = 'biobank'
 histology_collection_id = 'biobank'
 
-def build_subject_table(srarun):
+def build_subject_table(histology, biobank, srarun):
     fieldnames = ['id_namespace', 'id', 'project_id_namespace',
                     'project', 'persistent_id', 'creation_time',
                     'granularity']
@@ -33,7 +33,14 @@ def build_subject_table(srarun):
         reader = csv.DictReader(tsvfile, delimiter='\t')
         for row in reader:            
             subjects.add(row['submitted_subject_id'])
-
+    with open(histology) as tsvfile:
+        reader = csv.DictReader(tsvfile)
+        for row in reader:            
+            subjects.add(row['Subject ID'])
+    with open(biobank) as tsvfile:
+        reader = csv.DictReader(tsvfile, delimiter='\t')
+        for row in reader:
+            subjects.add(row['subjectId'])
     with open('datapackage/subject.tsv', 'w') as tsvfile,\
       open('datapackage/subject_role_taxonomy.tsv', 'w') as role_taxononmy_file:
         writer = csv.DictWriter(tsvfile, fieldnames=fieldnames, delimiter='\t')
@@ -410,7 +417,7 @@ if __name__ == '__main__':
         sraruntsv = 'inputdata/SraRunTable.tsv' # tab delimited
         histologycsv = 'inputdata/GTExHistology.csv' # comma delimited
         biobanktsv = 'inputdata/biobank_collection_20200527_070347.tsv' # tab delimited
-        subject_ids = build_subject_table(sraruntsv)
+        subject_ids = build_subject_table(histologycsv, biobanktsv, sraruntsv)
         build_subject_in_collection_table(subject_ids)
         build_samples(histologycsv, biobanktsv, sraruntsv)
         build_files(sraruntsv)
