@@ -5,6 +5,8 @@ pdf_options:
 
 # To Do
 
+Vocabulary tables should not be part of the DCC work
+
 ## Tables
 
 - [X] `file`
