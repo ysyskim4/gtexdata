@@ -3,9 +3,24 @@ pdf_options:
   format: Letter
 ---
 
+
+
 # To Do
 
 Vocabulary tables should not be part of the DCC work
+Only provide terms (compact IDs)
+
+DCCs should define their own namespaces following the guidelines
+
+Need to define semantics of collections & projects, relationships to
+programs and datasets
+
+Need mimetype in file table
+
+How to reproduce binary table
+```
+https://cfde.derivacloud.org/ermrest/catalog/4/attributegroup/P:=CommonFundProgram/Dataset/FilesInDatasets/File/GeneratedBy/DataEvent/AssayedBy/BioSample/!anatomy::null::/Anatomy/anatomy:=name;programs:=array_d(P:name)
+```
 
 ## Tables
 
@@ -209,27 +224,27 @@ table = Table('datapackage/anatomy.tsv', schema=anatomy.descriptor)
 anatomy.table.save('data', storage='sql', engine=engine)
 
 # Load order
-datapackage/id_namespace.tsv
-datapackage/subject_role.tsv
-datapackage/subject_granularity.tsv
-datapackage/anatomy.tsv
-datapackage/assay_type.tsv
-datapackage/file_format.tsv
-datapackage/data_type.tsv
-datapackage/ncbi_taxonomy.tsv
-datapackage/project.tsv
-datapackage/project_in_project.tsv
-datapackage/collection.tsv
-datapackage/collection_defined_by_project.tsv
-datapackage/collection_in_collection.tsv
-datapackage/subject.tsv
-datapackage/biosample.tsv
-datapackage/file.tsv
-datapackage/biosample_from_subject.tsv
-datapackage/biosample_in_collection.tsv
-datapackage/file_describes_biosample.tsv
-datapackage/file_describes_subject.tsv
-datapackage/file_in_collection.tsv
-datapackage/subject_in_collection.tsv
-datapackage/subject_role_taxonomy.tsv
+id_namespace.tsv
+subject_role.tsv
+subject_granularity.tsv
+anatomy.tsv
+assay_type.tsv
+file_format.tsv
+data_type.tsv
+ncbi_taxonomy.tsv
+project.tsv
+project_in_project.tsv
+collection.tsv
+collection_defined_by_project.tsv
+collection_in_collection.tsv
+subject.tsv
+biosample.tsv
+file.tsv
+biosample_from_subject.tsv
+biosample_in_collection.tsv
+file_describes_biosample.tsv
+file_describes_subject.tsv
+file_in_collection.tsv
+subject_in_collection.tsv
+subject_role_taxonomy.tsv
 ```
