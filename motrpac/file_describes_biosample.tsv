@@ -1,1 +1,4 @@
 file_id_namespace	file_id	biosample_id_namespace	biosample_id
+https://motrpac-data.org/	motrpac-external-release1-results/epigenomics/T70_white_adipose/rrbs/results/90160017002_bismark.cov_v1.gz	https://motrpac-data.org/	90160017002
+https://motrpac-data.org/	motrpac-external-release1-results/epigenomics/qa_qc/MoTrPAC_rrbs_pipeline_qc_metrics_v1.csv	https://motrpac-data.org/	90160017002
+https://motrpac-data.org/	motrpac-external-release1-results/epigenomics/qa_qc/MoTrPAC_rrbs_pipeline_qc_metrics_v1.csv	https://motrpac-data.org/	90159017002
