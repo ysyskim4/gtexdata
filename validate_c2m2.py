@@ -5,10 +5,6 @@
 import sys
 import csv
 import datapackage
-
-from pronto import Ontology
-from gtex_maps import anatomy_dict, assay_types, edam_types
-
 from tableschema.exceptions import CastError
 
 def validate(dpackage, resource='all'):
